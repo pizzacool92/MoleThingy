@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matter.js Cube Spawner with Image</title>
+    <title>Matter.js Cube Spawner with Image and Slider</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; }
         canvas { display: block; }
+        #sliderContainer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+    <div id="sliderContainer">
+        <label for="sizeSlider">Block Size: </label>
+        <input type="range" id="sizeSlider" min="10" max="200" value="50">
+    </div>
     <script>
         const Engine = Matter.Engine,
               Render = Matter.Render,
@@ -44,19 +57,21 @@
             }
         });
 
-        function createCube(x, y) {
-            return Bodies.rectangle(x, y, 50, 50, {
+        let blockSize = 50;
+
+        function createCube(x, y, size) {
+            return Bodies.rectangle(x, y, size, size, {
                 render: {
                     sprite: {
-                        texture: 'https://raw.githubusercontent.com/pizzacool92/MoleThingy/main/Molerat.jpg',
-                        xScale: 0.03,
-                        yScale: 0.03
+                        texture: 'Molerat.jpg',
+                        xScale: size / 50 * 0.03,
+                        yScale: size / 50 * 0.03
                     }
                 }
             });
         }
 
-        const initialCube = createCube(400, 200);
+        const initialCube = createCube(400, 200, blockSize);
 
         Composite.add(world, [floor, initialCube]);
 
@@ -78,7 +93,8 @@
             if (event.key.toLowerCase() === 'f') {
                 const newCube = createCube(
                     Math.random() * window.innerWidth,
-                    50
+                    50,
+                    blockSize
                 );
                 Composite.add(world, newCube);
             }
@@ -88,6 +104,11 @@
             render.canvas.width = window.innerWidth;
             render.canvas.height = window.innerHeight;
             Matter.Body.setPosition(floor, { x: window.innerWidth / 2, y: window.innerHeight });
+        });
+
+        const sizeSlider = document.getElementById('sizeSlider');
+        sizeSlider.addEventListener('input', (event) => {
+            blockSize = event.target.value;
         });
     </script>
 </body>

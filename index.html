@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matter.js Cube Spawner with Image and Size Slider</title>
+    <title>Matter.js Cube Spawner with Image and Size Input</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; }
@@ -11,7 +11,7 @@
         #controls {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             z-index: 10;
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
@@ -21,8 +21,8 @@
 </head>
 <body>
     <div id="controls">
-        <label for="sizeSlider">Block Size: </label>
-        <input type="range" id="sizeSlider" min="10" max="200" value="50">
+        <label for="sizeInput">Block Size: </label>
+        <input type="number" id="sizeInput" min="10" max="200" value="50">
     </div>
     <script>
         const Engine = Matter.Engine,
@@ -104,6 +104,16 @@
                     true
                 );
                 Composite.add(world, frozenCube);
+            } else if (event.key.toLowerCase() === 'z') {
+                const mousePosition = mouse.position;
+                const bodies = Composite.allBodies(world);
+                for (let i = 0; i < bodies.length; i++) {
+                    const body = bodies[i];
+                    if (Matter.Bounds.contains(body.bounds, mousePosition)) {
+                        Composite.remove(world, body);
+                        break;
+                    }
+                }
             }
         });
 
@@ -113,8 +123,8 @@
             Matter.Body.setPosition(floor, { x: window.innerWidth / 2, y: window.innerHeight });
         });
 
-        const sizeSlider = document.getElementById('sizeSlider');
-        sizeSlider.addEventListener('input', (event) => {
+        const sizeInput = document.getElementById('sizeInput');
+        sizeInput.addEventListener('input', (event) => {
             blockSize = event.target.value;
         });
     </script>

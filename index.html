@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matter.js Cube Spawner with Image and Slider</title>
+    <title>Matter.js Cube Spawner with Image and Size Slider</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; }
         canvas { display: block; }
-        #sliderContainer {
+        #controls {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -20,7 +20,7 @@
     </style>
 </head>
 <body>
-    <div id="sliderContainer">
+    <div id="controls">
         <label for="sizeSlider">Block Size: </label>
         <input type="range" id="sizeSlider" min="10" max="200" value="50">
     </div>
@@ -59,8 +59,9 @@
 
         let blockSize = 50;
 
-        function createCube(x, y, size) {
+        function createCube(x, y, size, isStatic = false) {
             return Bodies.rectangle(x, y, size, size, {
+                isStatic: isStatic,
                 render: {
                     sprite: {
                         texture: 'Molerat.jpg',
@@ -71,9 +72,7 @@
             });
         }
 
-        const initialCube = createCube(400, 200, blockSize);
-
-        Composite.add(world, [floor, initialCube]);
+        Composite.add(world, [floor]);
 
         const mouse = Mouse.create(render.canvas);
         const mouseConstraint = MouseConstraint.create(engine, {
@@ -92,11 +91,19 @@
         document.addEventListener('keydown', (event) => {
             if (event.key.toLowerCase() === 'f') {
                 const newCube = createCube(
-                    Math.random() * window.innerWidth,
-                    50,
+                    mouse.position.x,
+                    mouse.position.y,
                     blockSize
                 );
                 Composite.add(world, newCube);
+            } else if (event.key.toLowerCase() === 'g') {
+                const frozenCube = createCube(
+                    mouse.position.x,
+                    mouse.position.y,
+                    blockSize,
+                    true
+                );
+                Composite.add(world, frozenCube);
             }
         });
 

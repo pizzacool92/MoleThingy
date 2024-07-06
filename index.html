@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matter.js Cube Spawner with Image, Size, and Color Input</title>
+    <title>Matter.js Cube Spawner with Image and Size Input</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; }
@@ -23,9 +23,6 @@
     <div id="controls">
         <label for="sizeInput">Block Size: </label>
         <input type="number" id="sizeInput" min="10" max="200" value="50">
-        <br>
-        <label for="colorInput">Block Color: </label>
-        <input type="color" id="colorInput" value="#ff0000">
     </div>
     <script>
         const Engine = Matter.Engine,
@@ -61,24 +58,15 @@
         });
 
         let blockSize = 50;
-        let blockColor = "#ff0000";
 
-        function createCube(x, y, size, color, isStatic = false) {
-            const texture = new Image();
-            texture.src = 'Molerat.jpg';
-            
+        function createCube(x, y, size, isStatic = false) {
             return Bodies.rectangle(x, y, size, size, {
                 isStatic: isStatic,
                 render: {
                     sprite: {
-                        texture: texture,
+                        texture: 'Molerat.jpg',
                         xScale: size / 50 * 0.03,
                         yScale: size / 50 * 0.03
-                    }
-                },
-                plugin: {
-                    attract: {
-                        color: color
                     }
                 }
             });
@@ -105,8 +93,7 @@
                 const newCube = createCube(
                     mouse.position.x,
                     mouse.position.y,
-                    blockSize,
-                    blockColor
+                    blockSize
                 );
                 Composite.add(world, newCube);
             } else if (event.key.toLowerCase() === 'g') {
@@ -114,7 +101,6 @@
                     mouse.position.x,
                     mouse.position.y,
                     blockSize,
-                    blockColor,
                     true
                 );
                 Composite.add(world, frozenCube);
@@ -140,35 +126,6 @@
         const sizeInput = document.getElementById('sizeInput');
         sizeInput.addEventListener('input', (event) => {
             blockSize = event.target.value;
-        });
-
-        const colorInput = document.getElementById('colorInput');
-        colorInput.addEventListener('input', (event) => {
-            blockColor = event.target.value;
-        });
-
-        // Custom render plugin to apply color tint
-        Matter.use({
-            name: 'attract',
-            version: '0.1.0',
-            for: 'render',
-            install: function(render) {
-                const context = render.context;
-                render.beforeRender(() => {
-                    context.save();
-                });
-                render.afterRender(() => {
-                    context.restore();
-                });
-            },
-            render: function(render, body) {
-                const context = render.context;
-                const color = body.plugin.attract.color;
-                context.globalCompositeOperation = 'multiply';
-                context.fillStyle = color;
-                context.fillRect(body.bounds.min.x, body.bounds.min.y, body.bounds.max.x - body.bounds.min.x, body.bounds.max.y - body.bounds.min.y);
-                context.globalCompositeOperation = 'source-over';
-            }
         });
     </script>
 </body>
